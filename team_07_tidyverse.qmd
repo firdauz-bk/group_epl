@@ -6,6 +6,12 @@ editor: visual
 toc: true
 toc-depth: 2
 embed-resources: true
+references:
+  - title: "Car Specification Dataset 1945-2020"
+    url: https://www.kaggle.com/datasets/jahaidulislam/car-specification-dataset-1945-2020
+    author: "Jahaidul Islam"
+    year: 2023
+    description: "This dataset provides detailed specifications of car models ranging from 1945 to 2020, including engine capacity and price, suitable for analytical purposes in automotive industry studies."
 ---
 
 ## Load Libraries
@@ -35,6 +41,14 @@ results <- read_csv("dataset/epl_results.csv")
 
 # Task 2: Finding and Visualizing a Real-World Dataset
 
+## Import the dataset
+
+The dataset contains a list of cars manufactured from 1945 to 2020. It includes details such as make, model, year, engine size, fuel type, transmission type, drivetrain, body style, number of doors, etc. The data is from [Kaggle](https://www.kaggle.com/datasets/jahaidulislam/car-specification-dataset-1945-2020) by Jahaidul Islam.
+```{r}
+cdf <- read_csv("dataset/car_data.csv")
+tail(cdf)
+nrow(cdf)
+```
 ...
 
 # Task 3: Visualizing Michelson’s Speed-of-Light Measurements
@@ -44,12 +58,13 @@ data(morley)
 morley <- as_tibble(morley)
 morley
 ```
+
 ## 3.1 Convert 'Expt' Column to Factoe
 
 ```{r}
 morley <- morley %>%
   mutate(Expt = as.factor(Expt))
-```   
+```
 
 ## 3.2 Plot 1 – Create a Scatter Plot displaying Experiment Number vs. Measured Speeds
 
@@ -72,6 +87,7 @@ morley %>%
        x = "Experiment Number",
        y = "Measured Speeds")
 ```
+
 ## Plot 3 – Add a Violin Plot in Plot 2
 
 ```{r}
@@ -83,6 +99,7 @@ morley %>%
        x = "Experiment Number",
        y = "Measured Speeds")
 ```
+
 ## Plot 4 – Create a Faceted Plot Containing 5 Histograms
 
 ```{r}
@@ -94,4 +111,5 @@ morley %>%
        x = "Measured Speeds",
        y = "Frequency")
 ```
+
 ## Discuss Your Choice Among the 4 Visualization Plots
