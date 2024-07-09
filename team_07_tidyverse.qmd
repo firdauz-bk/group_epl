@@ -174,7 +174,6 @@ gt Package: The gt package is chosen for its ability to create professional-look
 Bold Title and Borders: Adding a bold title using md and borders using cell_borders makes the table visually appealing and easy to read. Borders enhance the table's structure, while the bold title draws attention to the main heading.
 
 Color Scales: Using data_color to apply color scales to points, goal differences, and goals scored highlights important data points. This visual enhancement helps readers quickly identify key statistics and differences between teams.
-...
 
 # Task 2: Finding and Visualizing a Real-World Dataset
 
