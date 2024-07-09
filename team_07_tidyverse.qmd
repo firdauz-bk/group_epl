@@ -1,0 +1,40 @@
+---
+title: "Team 7 - EPL Football Results (Tidyverse)"
+format: html
+author: Firdauz B K, Jit Lin, Jonathan, Xiang Hong
+editor: visual
+toc: true
+toc-depth: 2
+embed-resources: true
+---
+## Load Libraries
+```{r}
+library(gt)
+library(tidyverse)
+library(readr)
+```
+
+## Import Dataset
+```{r}
+team <- read_csv("dataset/epl_teams.csv")
+results <- read_csv("dataset/epl_results.csv")
+```
+
+
+# Task 1: Converting EPL Football Results into a League Table
+
+## 1.1 Generate a League Table from the EPL Results
+
+...
+
+## 1.2 Improve Visualization Using `gt` Functions
+
+...
+
+# Task 2: Finding and Visualizing a Real-World Dataset
+
+...
+
+# Task 3: Visualizing Michelson’s Speed-of-Light Measurements
+
+...
