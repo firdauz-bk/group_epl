@@ -7,7 +7,9 @@ toc: true
 toc-depth: 2
 embed-resources: true
 ---
+
 ## Load Libraries
+
 ```{r}
 library(gt)
 library(tidyverse)
@@ -15,11 +17,11 @@ library(readr)
 ```
 
 ## Import Dataset
+
 ```{r}
 team <- read_csv("dataset/epl_teams.csv")
 results <- read_csv("dataset/epl_results.csv")
 ```
-
 
 # Task 1: Converting EPL Football Results into a League Table
 
@@ -37,4 +39,59 @@ results <- read_csv("dataset/epl_results.csv")
 
 # Task 3: Visualizing Michelson’s Speed-of-Light Measurements
 
-...
+```{r}
+data(morley)
+morley <- as_tibble(morley)
+morley
+```
+## 3.1 Convert 'Expt' Column to Factoe
+
+```{r}
+morley <- morley %>%
+  mutate(Expt = as.factor(Expt))
+```   
+
+## 3.2 Plot 1 – Create a Scatter Plot displaying Experiment Number vs. Measured Speeds
+
+```{r}
+morley %>%
+  ggplot(aes(x = Expt, y = Speed)) +
+  geom_point() +
+  labs(title = "Measured Speeds vs Experiment Number",
+       x = "Experiment Number",
+       y = "Measured Speeds")
+```
+
+## Plot 2 – Create a Box Plot Measured Speeds with One Box Experiment
+
+```{r}
+morley %>%
+  ggplot(aes(x = Expt, y = Speed)) +
+  geom_boxplot() +
+  labs(title = "Box Plot of Measured Speeds with One Box Experiment",
+       x = "Experiment Number",
+       y = "Measured Speeds")
+```
+## Plot 3 – Add a Violin Plot in Plot 2
+
+```{r}
+morley %>%
+  ggplot(aes(x = Expt, y = Speed)) +
+  geom_boxplot() +
+  geom_violin() +
+  labs(title = "Box Plot of Measured Speeds with One Box Experiment",
+       x = "Experiment Number",
+       y = "Measured Speeds")
+```
+## Plot 4 – Create a Faceted Plot Containing 5 Histograms
+
+```{r}
+morley %>%
+  ggplot(aes(x = Speed)) +
+  geom_histogram() +
+  facet_wrap(~Expt) +
+  labs(title = "Faceted Plot of Measured Speeds",
+       x = "Measured Speeds",
+       y = "Frequency")
+```
+## Discuss Your Choice Among the 4 Visualization Plots
