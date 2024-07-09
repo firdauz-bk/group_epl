@@ -25,7 +25,7 @@ library(readr)
 ## Import Dataset
 
 ```{r}
-team <- read_csv("dataset/epl_teams.csv")
+teams <- read_csv("dataset/epl_teams.csv")
 results <- read_csv("dataset/epl_results.csv")
 ```
 
