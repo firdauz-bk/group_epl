@@ -37,9 +37,17 @@ results <- read_csv("dataset/epl_results.csv")
 
 ```{r}
 standings <- results %>%
+
+  # Convert the dataframe from wide to long format
   pivot_longer(-home_team, names_to = "away_team", values_to = "score") %>%
+
+  # Remove entries where the home team and away team are the same (diagonal entries)
   filter(home_team != away_team) %>%  # Remove diagonal entries
+
+  # Separate the score into home goals and away goals, converting them to numeric
   separate(score, into = c("home_goals", "away_goals"), convert = TRUE) %>%
+
+  # Calculate points for home and away teams based on match results
   mutate(
     home_points = case_when(
       home_goals > away_goals ~ 3,
@@ -64,17 +72,25 @@ Case When: case_when is used to assign points based on match results. This metho
 
 ```{r}
 total_stats <- standings %>%
+
+  # Pivot the dataframe to have one row per team per match
   pivot_longer(
     cols = c(home_team, away_team),
     names_to = "home_away",
     values_to = "team"
   ) %>%
+
+  # Calculate points, goals for, and goals against for each team
   mutate(
     points = if_else(home_away == "home_team", home_points, away_points),
     goals_for = if_else(home_away == "home_team", home_goals, away_goals),
     goals_against = if_else(home_away == "home_team", away_goals, home_goals)
   ) %>%
+
+  # Group the data by team to calculate total stats
   group_by(team) %>%
+
+  # Summarize the data to get total points, goals for, goals against, and goal difference for each team
   summarize(
     points = sum(points),
     goals_for = sum(goals_for),
@@ -88,9 +104,17 @@ Summarizing Statistics: Grouping by team and summarizing statistics helps in cal
 
 ```{r}
 final_standings <- total_stats %>%
+
+  # Join total_stats with team names to get full team names
   left_join(teams, by = c("team" = "abbr")) %>%
+
+  # Arrange the teams by points, goal difference, and goals scored in descending order
   arrange(desc(points), desc(goal_diff), desc(goals_for)) %>%
+
+  # Create a rank column based on the ordering
   mutate(rank = row_number()) %>%
+
+  # Select and rename the columns to match the desired output
   select(rank, team = name, points, goal_diff, goals_for)
 ```
 
@@ -103,8 +127,11 @@ print(final_standings, n = 20)
 ## 1.2 Improve Visualization Using `gt` Functions
 
 ```{r}
+  # Create the gt table
 league_table <- final_standings %>%
   gt() %>%
+
+  # Add a title and subtitle to the table
   tab_header(
     title = md("EPL 2019-2020 League Table"),
     subtitle = "Final Standings"
@@ -116,6 +143,8 @@ league_table <- final_standings %>%
     goal_diff = "Goal Difference",
     goals_for = "Goals For"
   ) %>%
+
+  # Center align and bold the column labels
   tab_style(
     style = cell_text(
       align = "center",
@@ -123,6 +152,8 @@ league_table <- final_standings %>%
     ),
     locations = cells_column_labels(everything())
   ) %>%
+
+  # Apply a light grey background, black text, and borders to all body cells
   tab_style(
     style = list(
       cell_fill(color = "lightgrey"),
@@ -134,6 +165,8 @@ league_table <- final_standings %>%
       rows = everything()
     )
   ) %>%
+
+  # Apply a color gradient from white to gold based on the points column values
   data_color(
     columns = vars(points),
     colors = scales::col_numeric(
@@ -141,6 +174,8 @@ league_table <- final_standings %>%
       domain = c(min(final_standings$points), max(final_standings$points))
     )
   ) %>%
+
+  # Apply a color gradient from white to light green based on the goal_diff column values
   data_color(
     columns = vars(goal_diff),
     colors = scales::col_numeric(
@@ -148,6 +183,8 @@ league_table <- final_standings %>%
       domain = c(min(final_standings$goal_diff), max(final_standings$goal_diff))
     )
   ) %>%
+
+    # Apply a color gradient from white to light blue based on the goals_for column values
   data_color(
     columns = vars(goals_for),
     colors = scales::col_numeric(
