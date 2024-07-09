@@ -149,6 +149,10 @@ league_table <- final_standings %>%
   )
 ```
 
+```{r}
+league_table
+```
+
 ### Rationale:
 
 #### Data Transformation:
