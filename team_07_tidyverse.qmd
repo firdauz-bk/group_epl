@@ -53,13 +53,20 @@ nrow(cdf)
 
 # Task 3: Visualizing Michelson’s Speed-of-Light Measurements
 
+Albert A. Michelson (1882) published estimates of the speed of light obtained through a seminal experiment. The results (in km/s minus 299,000) are stored in R’s built-in morley data frame, which can be loaded into R’s global environment using the following line of code:
+
 ```{r}
 data(morley)
 morley <- as_tibble(morley)
 morley
 ```
 
-## 3.1 Convert 'Expt' Column to Factoe
+In the Expt column, each measurement is attributed to one of five different experiments. The first 20 measurements belong to experiment 1, the next 20 belong to experiment 2, and so forth. In this exercise, you will visualize these data using various types of graphics, including scatter plot, box plot, violin plot, and facet (one per experiment) plot.
+
+For all the plots, customize the axis labels and add a plot title. Additionally, include a plot caption attributing the source as “R data set `morley`”.
+
+## 3.1 Convert 'Expt' Column to Factor
+
 
 ```{r}
 morley <- morley %>%
@@ -70,60 +77,75 @@ morley <- morley %>%
 
 ```{r}
 morley %>%
-  ggplot(aes(x = Expt, y = Speed)) +
+  ggplot(aes(x = Speed, y = Expt)) +
   geom_point() +
   labs(title = "Scatter Plot of Measured Speeds vs Experiment Number",
-       x = "Experiment Number",
-       y = "Measured Speeds",
+       y = "Experiment Number",
+       x = "Measured Speeds",
        caption = "Source: R data set `morley`")
 
 ```
 
-## Plot 2 – Create a Box Plot Measured Speeds with One Box Experiment
+## 3.3 Plot 2 – Create a Box Plot Measured Speeds with One Box Experiment
 
 ```{r}
 morley %>%
-  ggplot(aes(x = Expt, y = Speed)) +
+  ggplot(aes(x = Speed, y = Expt)) +
   geom_boxplot() +
   labs(title = "Box Plot of Measured Speeds with One Box Experiment",
-       x = "Experiment Number",
-       y = "Measured Speeds",
+       y = "Experiment Number",
+       x = "Measured Speeds",
        caption = "Source: R data set `morley`")
 
 ```
 
-## Plot 3 – Add a Violin Plot in Plot 2
+## 3.4 Plot 3 – Add a Violin Plot in Plot 2
 
 ```{r}
 morley %>%
-  ggplot(aes(x = Expt, y = Speed)) +
+  ggplot(aes(x = Speed, y = Expt)) +
   geom_boxplot() +
   geom_violin(alpha = 0.5) +
   labs(title = "Violin Plot of Measured Speeds with One Box Experiment",
-       x = "Experiment Number",
-       y = "Measured Speeds",
+       y = "Experiment Number",
+       x = "Measured Speeds",
        caption = "Source: R data set `morley`")
 
 ```
 
-## Plot 4 – Create a Faceted Plot Containing 5 Histograms
+## 3.5 Plot 4 – Create a Faceted Plot Containing 5 Histograms
 
 ```{r}
 
-morley %>%
-  ggplot(aes(x = Speed)) +
-  geom_histogram(binwidth=20, color = "black") +
-  facet_wrap(~Expt) +
-  labs(title = "Faceted Plot of Measured Speeds",
-       x = "Measured Speeds",
-       y = "Frequency",
-       caption = "Source: R data set `morley`") +
-  theme(strip.text.y = element_text(margin = margin(t = 0.5, unit = "cm")),
-        strip.placement = "outside")
-
+ggplot(morley, aes(x = Speed)) +
+  geom_histogram(binwidth = 20, fill = "grey", color = "black") +
+  facet_wrap(~Expt, scales = "free_x") +
+  labs(title = "Histogram of Measured Speeds by Experiment",
+       caption = "R data set 'morley'") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
 ```
 
-## Discuss Your Choice Among the 4 Visualization Plots
+## 3.6 Discuss Your Choice Among the 4 Visualization Plots
+
+Scatter Plot (Plot 1):
+
+Purpose: Visualize the relationship between Experiment Number (Expt) and Measured Speeds (Speed).
+Insights: Helps in understanding if there are any patterns or trends in the measured speeds across different experiments. Useful for initial exploration of data distribution and outliers.
+Box Plot (Plot 2):
+
+Purpose: Show the distribution of Measured Speeds (Speed) within each Experiment (Expt).
+Insights: Provides a clear view of the central tendency, spread, and potential outliers in measured speeds for each experiment. Useful for comparing the variability between experiments.
+Box Plot with Violin Plot Overlay (Plot 3):
+
+Purpose: Enhance the Box Plot by adding a Violin Plot, which shows the density of the distribution.
+Insights: Combines the insights from the Box Plot with additional information on the distribution shape and density. Useful for a more nuanced understanding of the data distribution within each experiment.
+Faceted Histograms (Plot 4):
+
+Purpose: Display the distribution of Measured Speeds (Speed) across all experiments, with each experiment shown separately.
+Insights: Allows for easy comparison of the distribution of speeds across different experiments. Useful for identifying differences or similarities in speed measurements between experiments.
 
 I would choose the violin plot among the 4 plots as it provides a scale of the amount of data distributed in a box plot, along with the usual information provided in a box plot, as the violin plot is a combination of a box plot and a density plot, which provides a better understanding of the data distribution.
 
