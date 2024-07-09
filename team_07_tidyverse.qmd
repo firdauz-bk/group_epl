@@ -72,10 +72,10 @@ morley <- morley %>%
 morley %>%
   ggplot(aes(x = Expt, y = Speed)) +
   geom_point() +
-  labs(title = "Measured Speeds vs Experiment Number",
+  labs(title = "Scatter Plot of Measured Speeds vs Experiment Number",
        x = "Experiment Number",
-       y = "Measured Speeds")
-  labs(caption = "Source: R data set `morley`")
+       y = "Measured Speeds",
+       caption = "Source: R data set `morley`")
 
 ```
 
@@ -87,8 +87,8 @@ morley %>%
   geom_boxplot() +
   labs(title = "Box Plot of Measured Speeds with One Box Experiment",
        x = "Experiment Number",
-       y = "Measured Speeds")
-  labs(caption = "Source: R data set `morley`")
+       y = "Measured Speeds",
+       caption = "Source: R data set `morley`")
 
 ```
 
@@ -98,27 +98,32 @@ morley %>%
 morley %>%
   ggplot(aes(x = Expt, y = Speed)) +
   geom_boxplot() +
-  geom_violin() +
-  labs(title = "Box Plot of Measured Speeds with One Box Experiment",
+  geom_violin(alpha = 0.5) +
+  labs(title = "Violin Plot of Measured Speeds with One Box Experiment",
        x = "Experiment Number",
-       y = "Measured Speeds")
-  labs(caption = "Source: R data set `morley`")
+       y = "Measured Speeds",
+       caption = "Source: R data set `morley`")
 
 ```
 
 ## Plot 4 – Create a Faceted Plot Containing 5 Histograms
 
 ```{r}
+
 morley %>%
   ggplot(aes(x = Speed)) +
-  geom_histogram() +
+  geom_histogram(binwidth=20, color = "black") +
   facet_wrap(~Expt) +
   labs(title = "Faceted Plot of Measured Speeds",
        x = "Measured Speeds",
-       y = "Frequency")
-  labs(caption = "Source: R data set `morley`")
+       y = "Frequency",
+       caption = "Source: R data set `morley`") +
+  theme(strip.text.y = element_text(margin = margin(t = 0.5, unit = "cm")),
+        strip.placement = "outside")
 
 ```
 
 ## Discuss Your Choice Among the 4 Visualization Plots
+
+I would choose the violin plot among the 4 plots as it provides a scale of the amount of data distributed in a box plot, along with the usual information provided in a box plot, as the violin plot is a combination of a box plot and a density plot, which provides a better understanding of the data distribution.
 
