@@ -60,6 +60,8 @@ morley %>%
   labs(title = "Measured Speeds vs Experiment Number",
        x = "Experiment Number",
        y = "Measured Speeds")
+  labs(caption = "Source: R data set `morley`")
+
 ```
 
 ## Plot 2 – Create a Box Plot Measured Speeds with One Box Experiment
@@ -71,6 +73,8 @@ morley %>%
   labs(title = "Box Plot of Measured Speeds with One Box Experiment",
        x = "Experiment Number",
        y = "Measured Speeds")
+  labs(caption = "Source: R data set `morley`")
+
 ```
 ## Plot 3 – Add a Violin Plot in Plot 2
 
@@ -82,6 +86,8 @@ morley %>%
   labs(title = "Box Plot of Measured Speeds with One Box Experiment",
        x = "Experiment Number",
        y = "Measured Speeds")
+  labs(caption = "Source: R data set `morley`")
+
 ```
 ## Plot 4 – Create a Faceted Plot Containing 5 Histograms
 
@@ -93,5 +99,8 @@ morley %>%
   labs(title = "Faceted Plot of Measured Speeds",
        x = "Measured Speeds",
        y = "Frequency")
+  labs(caption = "Source: R data set `morley`")
+
 ```
 ## Discuss Your Choice Among the 4 Visualization Plots
+
