@@ -33,7 +33,7 @@ results <- read_csv("dataset/epl_results.csv")
 
 ## 1.1 Generate a League Table from the EPL Results
 
-### Process the results data
+### Processing the results data
 
 ```{r}
 standings <- results %>%
@@ -53,6 +53,12 @@ standings <- results %>%
     )
   )
 ```
+
+Pivoting Data: The data is pivoted from wide to long format using pivot_longer, making it easier to calculate statistics for home and away teams. This transformation simplifies the processing and makes the data structure more manageable for calculations.
+
+Separating Scores: The scores are separated into home and away goals using separate, allowing for individual goal calculations. This step is crucial for accurately determining match outcomes and calculating points.
+
+Case When: case_when is used to assign points based on match results. This method is clear and concise, handling multiple conditions efficiently and ensuring that points are correctly allocated for wins, draws, and losses.
 
 ### Calculate total statistics for each team
 
@@ -76,6 +82,8 @@ total_stats <- standings %>%
     goal_diff = goals_for - goals_against
   )
 ```
+Summarizing Statistics: Grouping by team and summarizing statistics helps in calculating the total points, goals for, goals against, and goal difference. This aggregation provides a comprehensive view of each team's performance throughout the season.
+
 ### Join with team names and create final standings
 
 ```{r}
@@ -153,23 +161,7 @@ league_table <- final_standings %>%
 league_table
 ```
 
-### Rationale:
-
-#### Data Transformation:
-
-Pivoting Data: The data is pivoted from wide to long format using pivot_longer, making it easier to calculate statistics for home and away teams. This transformation simplifies the processing and makes the data structure more manageable for calculations.
-
-Separating Scores: The scores are separated into home and away goals using separate, allowing for individual goal calculations. This step is crucial for accurately determining match outcomes and calculating points.
-
-#### Calculating Points and Statistics:
-
-Case When: case_when is used to assign points based on match results. This method is clear and concise, handling multiple conditions efficiently and ensuring that points are correctly allocated for wins, draws, and losses.
-
-Summarizing Statistics: Grouping by team and summarizing statistics helps in calculating the total points, goals for, goals against, and goal difference. This aggregation provides a comprehensive view of each team's performance throughout the season.
-
-#### Visualization:
-
-gt Package: The gt package is chosen for its ability to create professional-looking tables with extensive customization options. It offers flexibility in formatting and styling, making it ideal for presenting league tables.
+### Rationale behind improvements made:
 
 Bold Title and Borders: Adding a bold title using md and borders using cell_borders makes the table visually appealing and easy to read. Borders enhance the table's structure, while the bold title draws attention to the main heading.
 
