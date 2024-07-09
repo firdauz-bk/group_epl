@@ -98,6 +98,7 @@ total_stats <- standings %>%
     goal_diff = goals_for - goals_against
   )
 ```
+
 Summarizing Statistics: Grouping by team and summarizing statistics helps in calculating the total points, goals for, goals against, and goal difference. This aggregation provides a comprehensive view of each team's performance throughout the season.
 
 ### Join with team names and create final standings
@@ -216,15 +217,174 @@ Footnote: A footnote is added to the table that explains the color coding used f
 
 # Task 2: Finding and Visualizing a Real-World Dataset
 
-## Import the dataset
+## 2.1 Use R Code to Validate Conditions C, D, and E for Your Data
 
-The dataset contains a list of cars manufactured from 1945 to 2020. It includes details such as make, model, year, engine size, fuel type, transmission type, drivetrain, body style, number of doors, etc. The data is from [Kaggle](https://www.kaggle.com/datasets/jahaidulislam/car-specification-dataset-1945-2020) by Jahaidul Islam.
+### A & B. Import the dataset
+
+The dataset contains a list of cars manufactured from 1945 to 2020. It includes details such as make, model, year, engine size, fuel type, transmission type, drivetrain, body style, number of doors, etc. The data is from [Kaggle](https://www.kaggle.com/datasets/sidharth178/car-prices-dataset) by **Sidharth Kumar Mohanty**.
+
+### C. Checking Observations
+
 ```{r}
 cdf <- read_csv("dataset/car_data.csv")
 tail(cdf)
 nrow(cdf)
 ```
-...
+
+The dataset consist of 19237 rows and 18 columns. This satisfy the criteria of number of observations \> 200.
+
+### Truncate
+
+There's too many observations, I will lower it to 500.
+
+```{r}
+cdf <- cdf %>% 
+  slice(1:500)
+
+```
+
+### D. Data Engineering - Converting the datatypes
+
+The datatype for Mileage and Price has been set to character. Due to Mileage data formatted as "10000 km", by removing the "km" and converting it to numeric. Price data is also converted to numeric.
+
+```{r}
+cdf <- cdf %>%
+  mutate(
+  Mileage = str_remove(Mileage, " km"),
+  Mileage = as.numeric(Mileage),
+  Price = as.numeric(Price)
+)
+head(cdf)
+```
+
+### E. Checking for Balance
+
+```{r}
+# Identify numeric columns
+numeric_columns <- sapply(cdf, is.numeric)
+
+# Filter dataset to only include numeric columns
+numeric_data <- cdf[, numeric_columns]
+
+# Check the names of these numeric columns
+print(names(numeric_data))
+
+if (length(numeric_data) >= 2) {
+  cat("The dataset includes at least two groups of continuous numerical data.\n")
+} else {
+  cat("The dataset does not meet the requirement of having at least two groups of continuous numerical data.\n")
+}
+
+# Calculate the number of non-NA observations in each numeric column
+non_na_counts <- sapply(numeric_data, function(x) sum(!is.na(x)))
+
+# Print counts
+print(non_na_counts)
+
+# Check for balance by defining a threshold, for example, no column should have less than 50% of the max count
+max_count <- max(non_na_counts)
+threshold <- 0.5 * max_count  # Adjust threshold as necessary
+
+if (all(non_na_counts >= threshold)) {
+  cat("The numeric data across groups is balanced.\n")
+} else {
+  cat("The numeric data across groups is unbalanced.\n")
+}
+```
+
+The numeric data in this dataset is balanced from the code above.
+
+## 2.2 Plot 1 – Generate an Ungrouped Histogram Using geom_histogram()
+
+### Data Cleaning
+
+```{r}
+summary(cdf$Price)
+```
+
+There are outliers in this data.
+
+**Generating the Ungouped Histogram** We will need to normalize it using a logarithmic transformation.
+
+```{r}
+# Apply a logarithmic transformation
+ cdf$Log_Price <- log1p(cdf$Price)  # log1p is log(x + 1) to handle zero values
+
+# Plot the histogram of the transformed prices
+ggplot(cdf, aes(x = Log_Price)) +
+  geom_histogram(bins = 30, fill = "blue", color = "black") +
+  labs(title = "Histogram of Car Prices (Log-Transformed)", 
+       x = "Price (Log-Transformed)", 
+       y = "Frequency",
+       caption = "Data source: Kaggle, Car Prices Dataset by Sidharth Kumar Mohanty \nSource: https://www.kaggle.com/datasets/sidharth178/car-prices-dataset") +
+  
+  theme_minimal()
+```
+
+## Plot 2 – Apply Grouped Histograms & Discuss Insights
+
+```{r}
+ggplot(cdf, aes(x = Log_Price, fill = Category)) +
+  geom_histogram(position = "dodge", bins = 10) +
+  labs(title = "Grouped Histogram of Car Prices by Category",
+       x = "Price (Log-Transformed)",
+       y = "Frequency",
+       caption = "Data source: Kaggle, Car Prices Dataset by Sidharth Kumar Mohanty \nSource: https://www.kaggle.com/datasets/sidharth178/car-prices-dataset") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom", # Moves the legend to the bottom
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.1, "cm"),
+        legend.background = element_rect(fill = "white", size = 0.5, linetype = "solid")) 
+```
+
+The histograms analyzing log-transformed car prices, both grouped by manufacturer type and ungrouped, provide critical insights from a data analytics perspective. The ungrouped histogram reveals a normalized distribution with a central concentration of prices, while the grouped histogram delineates price variability across different car types, highlighting dominant categories like sedans in higher price ranges and identifying market gaps in others. These visualizations are instrumental for manufacturers and marketers to refine production strategies, optimize pricing, and adjust marketing approaches based on prevalent price points and category performance, thereby aligning closely with consumer demand and market dynamics.
+
+## Plot 3 – Add a Rug Plot in Plot 2 and Deal with Overlapped Points
+
+```{r}
+# Generate grouped histograms of Log-Transformed Price by Car Category with a rug plot
+ggplot(cdf, aes(x = Log_Price, fill = Category)) +
+  geom_histogram(position = "dodge", bins = 10) +  # Adjusted bins for better visualization
+  geom_rug(color = "black", alpha = 0.5) +  # Adds a rug plot with some transparency
+  labs(title = "Grouped Histogram of Car Prices by Category",
+       x = "Price (Log-Transformed)",
+       y = "Frequency",
+       caption = "Data source: Kaggle, Car Prices Dataset by Sidharth Kumar Mohanty \nSource: https://www.kaggle.com/datasets/sidharth178/car-prices-dataset") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Improve x-axis label readability
+        legend.position = "bottom",  # Moves the legend to the bottom
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.1, "cm"),
+        legend.background = element_rect(fill = "white", size = 0.5, linetype = "solid"))
+```
+
+### Dealing with overlapping points
+
+```{r}
+library(ggplot2)
+
+# Generate grouped histograms of Log-Transformed Price by Car Category with a modified rug plot
+ggplot(cdf, aes(x = Log_Price, fill = Category, color = Category)) +
+  geom_histogram(position = "dodge", bins = 10) +  # Adjusted bins for better visualization
+  geom_rug(alpha = 0.1) +  # Using color aesthetics for Category and low alpha for overlap effect
+  labs(title = "Grouped Histogram of Car Prices by Category",
+       x = "Price (Log-Transformed)",
+       y = "Frequency",
+       caption = "Data source: Kaggle, Car Prices Dataset by Sidharth Kumar Mohanty \nSource: https://www.kaggle.com/datasets/sidharth178/car-prices-dataset") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Improve x-axis label readability
+        legend.position = "bottom",  # Moves the legend to the bottom
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.1, "cm"),
+        legend.background = element_rect(fill = "white", size = 0.5, linetype = "solid"))
+```
+
+Using colors for overlap in a rug plot is advantageous because it visually conveys the density of data points. When individual data points are represented with varying colors or transparency levels, areas where many points overlap become darker or show blended colors, effectively highlighting regions of high density. This method allows for a clear visual differentiation between sparsely and densely populated areas, making it easier for viewers to identify patterns, trends, and outliers within the dataset. Additionally, it enhances the readability of the plot without overcrowding it, which can happen with simple line overlays, thereby providing a more informative and aesthetically pleasing visualization.
+
 
 # Task 3: Visualizing Michelson’s Speed-of-Light Measurements
 
@@ -241,7 +401,6 @@ In the Expt column, each measurement is attributed to one of five different expe
 For all the plots, customize the axis labels and add a plot title. Additionally, include a plot caption attributing the source as “R data set `morley`”.
 
 ## 3.1 Convert 'Expt' Column to Factor
-
 
 ```{r}
 morley <- morley %>%
@@ -307,20 +466,12 @@ ggplot(morley, aes(x = Speed)) +
 
 Scatter Plot (Plot 1):
 
-Purpose: Visualize the relationship between Experiment Number (Expt) and Measured Speeds (Speed).
-Insights: Helps in understanding if there are any patterns or trends in the measured speeds across different experiments. Useful for initial exploration of data distribution and outliers.
-Box Plot (Plot 2):
+Purpose: Visualize the relationship between Experiment Number (Expt) and Measured Speeds (Speed). Insights: Helps in understanding if there are any patterns or trends in the measured speeds across different experiments. Useful for initial exploration of data distribution and outliers. Box Plot (Plot 2):
 
-Purpose: Show the distribution of Measured Speeds (Speed) within each Experiment (Expt).
-Insights: Provides a clear view of the central tendency, spread, and potential outliers in measured speeds for each experiment. Useful for comparing the variability between experiments.
-Box Plot with Violin Plot Overlay (Plot 3):
+Purpose: Show the distribution of Measured Speeds (Speed) within each Experiment (Expt). Insights: Provides a clear view of the central tendency, spread, and potential outliers in measured speeds for each experiment. Useful for comparing the variability between experiments. Box Plot with Violin Plot Overlay (Plot 3):
 
-Purpose: Enhance the Box Plot by adding a Violin Plot, which shows the density of the distribution.
-Insights: Combines the insights from the Box Plot with additional information on the distribution shape and density. Useful for a more nuanced understanding of the data distribution within each experiment.
-Faceted Histograms (Plot 4):
+Purpose: Enhance the Box Plot by adding a Violin Plot, which shows the density of the distribution. Insights: Combines the insights from the Box Plot with additional information on the distribution shape and density. Useful for a more nuanced understanding of the data distribution within each experiment. Faceted Histograms (Plot 4):
 
-Purpose: Display the distribution of Measured Speeds (Speed) across all experiments, with each experiment shown separately.
-Insights: Allows for easy comparison of the distribution of speeds across different experiments. Useful for identifying differences or similarities in speed measurements between experiments.
+Purpose: Display the distribution of Measured Speeds (Speed) across all experiments, with each experiment shown separately. Insights: Allows for easy comparison of the distribution of speeds across different experiments. Useful for identifying differences or similarities in speed measurements between experiments.
 
 I would choose the violin plot among the 4 plots as it provides a scale of the amount of data distributed in a box plot, along with the usual information provided in a box plot, as the violin plot is a combination of a box plot and a density plot, which provides a better understanding of the data distribution.
-
