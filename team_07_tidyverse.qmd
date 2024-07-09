@@ -33,11 +33,147 @@ results <- read_csv("dataset/epl_results.csv")
 
 ## 1.1 Generate a League Table from the EPL Results
 
-...
+### Process the results data
+
+```{r}
+standings <- results %>%
+  pivot_longer(-home_team, names_to = "away_team", values_to = "score") %>%
+  filter(home_team != away_team) %>%  # Remove diagonal entries
+  separate(score, into = c("home_goals", "away_goals"), convert = TRUE) %>%
+  mutate(
+    home_points = case_when(
+      home_goals > away_goals ~ 3,
+      home_goals == away_goals ~ 1,
+      TRUE ~ 0
+    ),
+    away_points = case_when(
+      away_goals > home_goals ~ 3,
+      home_goals == away_goals ~ 1,
+      TRUE ~ 0
+    )
+  )
+```
+
+### Calculate total statistics for each team
+
+```{r}
+total_stats <- standings %>%
+  pivot_longer(
+    cols = c(home_team, away_team),
+    names_to = "home_away",
+    values_to = "team"
+  ) %>%
+  mutate(
+    points = if_else(home_away == "home_team", home_points, away_points),
+    goals_for = if_else(home_away == "home_team", home_goals, away_goals),
+    goals_against = if_else(home_away == "home_team", away_goals, home_goals)
+  ) %>%
+  group_by(team) %>%
+  summarize(
+    points = sum(points),
+    goals_for = sum(goals_for),
+    goals_against = sum(goals_against),
+    goal_diff = goals_for - goals_against
+  )
+```
+### Join with team names and create final standings
+
+```{r}
+final_standings <- total_stats %>%
+  left_join(teams, by = c("team" = "abbr")) %>%
+  arrange(desc(points), desc(goal_diff), desc(goals_for)) %>%
+  mutate(rank = row_number()) %>%
+  select(rank, team = name, points, goal_diff, goals_for)
+```
+
+### Display the result
+
+```{r}
+print(final_standings, n = 20)
+```
 
 ## 1.2 Improve Visualization Using `gt` Functions
 
-...
+```{r}
+league_table <- final_standings %>%
+  gt() %>%
+  tab_header(
+    title = md("EPL 2019-2020 League Table"),
+    subtitle = "Final Standings"
+  ) %>%
+  cols_label(
+    rank = "Rank",
+    team = "Team",
+    points = "Points",
+    goal_diff = "Goal Difference",
+    goals_for = "Goals For"
+  ) %>%
+  tab_style(
+    style = cell_text(
+      align = "center",
+      weight = "bold"
+    ),
+    locations = cells_column_labels(everything())
+  ) %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "lightgrey"),
+      cell_text(color = "black"),
+      cell_borders(sides = "all", color = "black", weight = px(1))
+    ),
+    locations = cells_body(
+      columns = everything(),
+      rows = everything()
+    )
+  ) %>%
+  data_color(
+    columns = vars(points),
+    colors = scales::col_numeric(
+      palette = c("white", "gold"),
+      domain = c(min(final_standings$points), max(final_standings$points))
+    )
+  ) %>%
+  data_color(
+    columns = vars(goal_diff),
+    colors = scales::col_numeric(
+      palette = c("white", "lightgreen"),
+      domain = c(min(final_standings$goal_diff), max(final_standings$goal_diff))
+    )
+  ) %>%
+  data_color(
+    columns = vars(goals_for),
+    colors = scales::col_numeric(
+      palette = c("white", "lightblue"),
+      domain = c(min(final_standings$goals_for), max(final_standings$goals_for))
+    )
+  )
+```
+
+```{r}
+league_table
+```
+
+### Rationale:
+
+#### Data Transformation:
+
+Pivoting Data: The data is pivoted from wide to long format using pivot_longer, making it easier to calculate statistics for home and away teams. This transformation simplifies the processing and makes the data structure more manageable for calculations.
+
+Separating Scores: The scores are separated into home and away goals using separate, allowing for individual goal calculations. This step is crucial for accurately determining match outcomes and calculating points.
+
+#### Calculating Points and Statistics:
+
+Case When: case_when is used to assign points based on match results. This method is clear and concise, handling multiple conditions efficiently and ensuring that points are correctly allocated for wins, draws, and losses.
+
+Summarizing Statistics: Grouping by team and summarizing statistics helps in calculating the total points, goals for, goals against, and goal difference. This aggregation provides a comprehensive view of each team's performance throughout the season.
+
+#### Visualization:
+
+gt Package: The gt package is chosen for its ability to create professional-looking tables with extensive customization options. It offers flexibility in formatting and styling, making it ideal for presenting league tables.
+
+Bold Title and Borders: Adding a bold title using md and borders using cell_borders makes the table visually appealing and easy to read. Borders enhance the table's structure, while the bold title draws attention to the main heading.
+
+Color Scales: Using data_color to apply color scales to points, goal differences, and goals scored highlights important data points. This visual enhancement helps readers quickly identify key statistics and differences between teams.
 
 # Task 2: Finding and Visualizing a Real-World Dataset
 
